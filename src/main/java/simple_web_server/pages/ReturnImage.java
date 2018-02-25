@@ -3,6 +3,7 @@ package simple_web_server.pages;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class ReturnImage {
@@ -44,4 +45,12 @@ public class ReturnImage {
 	
 	return response;
 	}
+	
+	public void closeStream() throws IOException{
+		in.close();
+	}
 }
+
+
+
+

@@ -1,42 +1,38 @@
 package simple_web_server.webserver;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.apache.commons.io.IOUtils;
-
-import simple_web_server.pages.*;
+import simple_web_server.pages.UploadImage;
 
 
-
-public class GetRequestHandler {
-	
+public class PostRequestHandler {
 	private String url;
-    PrintWriter out;
-    OutputStream outFile;
-    Socket s;
+    private PrintWriter out;
+    private Socket s;
+    BufferedReader in;
 
 	
-	public GetRequestHandler(Socket socket,String request){
+	public PostRequestHandler(Socket socket, BufferedReader in, String request){
 		this.s=socket;
 		this.url = request.split(" ")[1];
+		this.in = in;
 	}
 	
 	protected void handleRequest() throws IOException{
 
-		if(url.equals("/images")){
+		if(url.matches("/upload/.*")){
+			
 			out = new PrintWriter(s.getOutputStream(), true);
-			GetImages files = new GetImages();
-			printOutput(files.getContent());
-		}if(url.matches("/image/.*")){
-			out = new PrintWriter(s.getOutputStream(), true);
-			ReturnImage file = new ReturnImage(url);
-			printOutput(file.getHeaders());
-			outFile = s.getOutputStream();
-			IOUtils.copy(file.getFileStream(),outFile);
-			file.closeStream();
+
+			UploadImage uploader = new UploadImage(s, out, in, url);
+			
+			uploader.handle();
+			
+			this.printOutput(uploader.getResponse());
+			
 		}else{
 			out = new PrintWriter(s.getOutputStream(), true);
 			out.println("HTTP/1.0 404");
@@ -53,4 +49,5 @@ public class GetRequestHandler {
 			out.println(response);
 		}
 	}
+
 }

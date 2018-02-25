@@ -11,6 +11,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 
+
 public class App 
 {
 	private static final int fNumberOfThreads = 100;
@@ -33,7 +34,6 @@ public class App
             final Socket connection = socket.accept();
             Runnable task = new Runnable()
             {
-               // @Override
                 public void run()
                 {
                     HandleRequest(connection);
@@ -66,6 +66,9 @@ public class App
             	GetRequestHandler getRequest = new GetRequestHandler(s, request);
             	getRequest.handleRequest();
             }else if(request_type.equals("POST")){
+            	
+            	PostRequestHandler postRequest = new PostRequestHandler(s, in, request);
+            	postRequest.handleRequest();
             }
             
             s.close();
