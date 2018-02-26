@@ -39,6 +39,7 @@ public class PostRequestHandler {
 	protected void handleRequest() throws IOException{
 
 		//Check to see if the URL of the request is supported
+		System.out.println(url);
 		if(url.matches("/upload/.*")){
 			//Instantiates out as a PrintWriter
 			out = new PrintWriter(s.getOutputStream(), true);

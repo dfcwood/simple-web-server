@@ -40,6 +40,8 @@ public class GetRequestHandler {
 	 */
 	protected void handleRequest() throws IOException{
 		
+		System.out.println("GetRequestHandler.handleRequest:  Testing URL " + url);
+		
 		//Determines the endpoint
 		if(url.equals("/images")){
 			out = new PrintWriter(s.getOutputStream(), true);
@@ -47,7 +49,7 @@ public class GetRequestHandler {
 			GetImages files = new GetImages();
 			//Outputs the response
 			printOutput(files.getContent());
-		}if(url.matches("/image/.*")){
+		}else if(url.matches("/image/.*")){
 			
 			//Assigns the output stream to a PrintWriter object
 			out = new PrintWriter(s.getOutputStream(), true);
@@ -73,6 +75,7 @@ public class GetRequestHandler {
 			}
 			
 		}else{
+			System.out.println("Out Here");
 			//All other non-supported endpoints are returned a 404
 			out = new PrintWriter(s.getOutputStream(), true);
 			out.println("HTTP/1.0 404");

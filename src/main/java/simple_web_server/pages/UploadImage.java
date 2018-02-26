@@ -72,7 +72,7 @@ public class UploadImage {
 			int fileSize = 0;
 			
 			String line = "";
-			//Cycle through request headers util the Excpect
+			//Cycle through request headers until the Expect
 			while(!(line = in.readLine()).contains("Expect")){
 				System.out.println("UploadImage.handle:  Header Info: " + line);
 				
@@ -95,7 +95,7 @@ public class UploadImage {
 		    int totalBytes = 0;
 		    
 		    
-			System.out.println("UploadImage.handle:  Attempting to copy");
+			System.out.println("UploadImage.handle:  Attempting to copy file with filesize " + fileSize);
 
 		    //While look takes bytes from the stream and passes them to a FileOutStream object to insert into a file
 		    //Continues until the amount of bytes transfered matches the Content-Length

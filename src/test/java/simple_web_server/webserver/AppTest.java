@@ -1,9 +1,12 @@
 package simple_web_server.webserver;
 
-import java.io.IOException;
-import java.net.InetAddress;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.net.Socket;
-import java.net.UnknownHostException;
+
+import org.mockito.Mockito;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -34,35 +37,131 @@ public class AppTest
     }
 
     /**
-     * Test the socket connection
+     * Test the upload endpoint to ensure it is working
      */
-    public void testSocketConnection()
+    public void testUpload()
     {
     	
+    	boolean goodTest = false;  //Test a good URL
+    	boolean badTest = false;	//Test a bad URL
+    	
+    	Socket socket = Mockito.mock(Socket.class);
+    	
+    	String fakeTestFile = "This is a fake test file";
+    	    	
+    	ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    	ByteArrayInputStream inStream = new ByteArrayInputStream(fakeTestFile.getBytes());
+    	
+    	BufferedReader bfreader = new BufferedReader(new StringReader("Content-Length: " + fakeTestFile.getBytes().length + "\nExpect"));
+    	
+    	//Test a good URL and a bad URL
+    	String request = "POST /upload/filename.png";
+    	String badRequest = "POST /badURL/filename.png";
+
+    	PostRequestHandler postRequestHandler = new PostRequestHandler(socket, bfreader, request);
+    	
+    	
     	try{
-    		App.main(null);
-    	}catch(IOException e){
-    		assertTrue(false);
-    		return;
-    	}
-    	  
-    	Socket socket;
-    	try{
-    		socket = new Socket(InetAddress.getLocalHost(), 9991);
-    	} catch(UnknownHostException e){
-    		assertTrue(false);
-    		return;
-    	} catch(IOException e){
-    		assertTrue(false);
-    		return;
+    		//Set up Mockito
+    		//Return ByteArrayOutputStream when requested
+    		Mockito.when(socket.getOutputStream()).thenReturn(outStream);
+    		Mockito.when(socket.getInputStream()).thenReturn(inStream);
+    		
+    		postRequestHandler.handleRequest();
+    		
+    		//Test the output
+    		if(outStream.toString().contains("HTTP/1.0 200")){
+    			goodTest = true;
+    		}
+    		
+        	postRequestHandler = new PostRequestHandler(socket, bfreader, badRequest);
+
+
+    		postRequestHandler.handleRequest();
+    		
+    		if(outStream.toString().contains("HTTP/1.0 404")){
+    			badTest = true;
+    		}
+    		
+    	} catch (Exception e){
+    		System.out.println(e.toString());
+    		e.printStackTrace();
     	}
 
-        assertTrue( socket.isConnected() );
-        try{
-        	socket.close();
-        } catch (IOException e){
-        	System.out.println(e.toString());
-        }
-        
+    	assertTrue(goodTest&&badTest);
+    }
+    
+    public void testImages(){
+    	//Create duplicate test values for good and bad testing
+    	Boolean goodTest = false;
+    	Boolean badTest = false;
+    	
+    	Socket socket = Mockito.mock(Socket.class);
+    	//Create Duplicate Streams for Good and Bad testing
+    	ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    	ByteArrayOutputStream outStreamBad = new ByteArrayOutputStream();
+
+    	
+    	String goodRequest = "GET /images";
+    	String badRequest = "GET /swimages";
+    	
+    	GetRequestHandler getRequestHandler = new GetRequestHandler(socket, goodRequest);
+    	GetRequestHandler getBadRequestHandler = new GetRequestHandler(socket, badRequest);
+
+    	
+    	try{
+    		Mockito.when(socket.getOutputStream()).thenReturn(outStream).thenReturn(outStreamBad);
+    		getRequestHandler.handleRequest();
+    		
+    		getBadRequestHandler.handleRequest();
+    		
+    		System.out.println("AppTest.testImages: Header Response from test: \n" + outStream.toString());
+    		if(outStream.toString().contains("HTTP/1.0 200")){
+    			goodTest = true;
+    		}
+    		if(outStreamBad.toString().contains("HTTP/1.0 404")){
+    			badTest = true;
+    		}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	assertTrue(goodTest&&badTest);
+    }
+    
+    public void testImage(){
+    	//Create duplicate test values for good and bad testing
+    	Boolean goodTest = false;
+    	Boolean badTest = false;
+    	
+    	Socket socket = Mockito.mock(Socket.class);
+    	//Create Duplicate Streams for Good and Bad testing
+    	ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    	ByteArrayOutputStream outStreamBad = new ByteArrayOutputStream();
+
+    	
+    	String goodRequest = "GET /image/picture.png";
+    	String badRequest = "GET /image/notThere.png";
+    	
+    	GetRequestHandler getRequestHandler = new GetRequestHandler(socket, goodRequest);
+    	GetRequestHandler getBadRequestHandler = new GetRequestHandler(socket, badRequest);
+
+    	
+    	try{
+    		Mockito.when(socket.getOutputStream()).thenReturn(outStream).thenReturn(outStreamBad);
+    		getRequestHandler.handleRequest();
+    		
+    		getBadRequestHandler.handleRequest();
+    		
+    		System.out.println("AppTest.testImages: Header Response from test: \n" + outStream.toString());
+    		if(outStream.toString().contains("HTTP/1.0 200")){
+    			goodTest = true;
+    		}
+    		if(outStreamBad.toString().contains("HTTP/1.0 404")){
+    			badTest = true;
+    		}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	assertTrue(goodTest&&badTest);
     }
 }
