@@ -1,5 +1,10 @@
 package simple_web_server.webserver;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -29,10 +34,35 @@ public class AppTest
     }
 
     /**
-     * Rigourous Test :-)
+     * Test the socket connection
      */
-    public void testApp()
+    public void testSocketConnection()
     {
-        assertTrue( true );
+    	
+    	try{
+    		App.main(null);
+    	}catch(IOException e){
+    		assertTrue(false);
+    		return;
+    	}
+    	  
+    	Socket socket;
+    	try{
+    		socket = new Socket(InetAddress.getLocalHost(), 9991);
+    	} catch(UnknownHostException e){
+    		assertTrue(false);
+    		return;
+    	} catch(IOException e){
+    		assertTrue(false);
+    		return;
+    	}
+
+        assertTrue( socket.isConnected() );
+        try{
+        	socket.close();
+        } catch (IOException e){
+        	System.out.println(e.toString());
+        }
+        
     }
 }
